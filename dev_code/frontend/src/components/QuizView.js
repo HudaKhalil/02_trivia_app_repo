@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import $ from 'jquery';
+import $, { ajax } from 'jquery';
 
 import '../stylesheets/QuizView.css';
 
@@ -36,7 +36,10 @@ class QuizView extends Component {
   }
 
   selectCategory = ({type, id=0}) => {
+    
     this.setState({quizCategory: {type, id}}, this.getNextQuestion)
+    // document.write('cat: '+ this.setState.quizCategory + ' quest: ' + this.getNextQuestion )
+    
   }
 
   handleChange = (event) => {
@@ -68,11 +71,16 @@ class QuizView extends Component {
           guess: '',
           forceEnd: result.question ? false : true
         })
+                // alert(ajax.data)
+                // alert(ajax.result)
+        // alert('Cat=:'+this.setState.quiz_category + " : " + 'Q=:'+this.setState.previous_question)
         return;
       },
+      // error: function(data, status){
+      //   console.log(data, status);
       error: (error) => {
-        document.write(error)
-        // alert('Unable to load question. Please try your request again')
+        // document.write(this.state.quizCategory + " : " + error)
+        alert('Please choose category to load quiz data.')
         return;
       }
     })

@@ -1,7 +1,10 @@
+  
 .vscode
+.history/
 __pycache__
+env
 venv
-
+lib/
 # OS generated files #
 ######################
 .DS_Store

@@ -25,6 +25,29 @@ def setup_db(app, database_path=database_path):
     migrate.init_app(app, db)
     db.create_all()
 
+
+'''
+Define session Commit, in case create_question fail
+'''
+def session_commit():
+    db.session.commit()
+    
+    
+'''
+Define session Rollback, in case create_question fail
+'''
+def session_rollback():
+    db.session.rollback()
+
+
+'''
+Define session Close, in case create_question fail
+'''
+def session_close():
+    db.session.close()
+    
+
+
 '''
 Question
 
@@ -46,7 +69,7 @@ class Question(db.Model):
 
   def insert(self):
     db.session.add(self)
-    db.session.commit()
+    # db.session.commit()
 
   
   def update(self):
@@ -56,12 +79,6 @@ class Question(db.Model):
     db.session.delete(self)
     db.session.commit()
  
-  
-  # def session_rollback(self):
-  #   db.session.rollback()
-  #   db.session.close()
-    
-
   def format(self):
     return {
       'id': self.id,

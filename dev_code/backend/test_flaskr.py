@@ -175,7 +175,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['question']['id']not in quiz_data['previous_questions'])
         
-    def test_400_play_quiz_with_category(self):
+    def test_400_play_quiz_with_body(self):
         res = self.client().post('/quizzes')
         data = json.loads(res.data)
 

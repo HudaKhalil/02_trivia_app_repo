@@ -3,7 +3,7 @@
 #----------------------------------------------------------------------------#
 from logging import error
 import os
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, abort, jsonify, flash
 from flask.globals import session 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import (func,
@@ -11,9 +11,10 @@ from sqlalchemy import (func,
 from flask_cors import CORS
 import random
 from sqlalchemy.sql.elements import Null
-from models import (setup_db, Question, Category)
+from models import (setup_db, Question, Category, session_commit, session_rollback, session_close)
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc
+from config import SECRET_KEY
 #----------------------------------------------------------------------------#
 # Constants
 #----------------------------------------------------------------------------#
@@ -71,6 +72,8 @@ def get_err_msg(error, err_default_desc):
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
+  app.secret_key = SECRET_KEY
+    
   setup_db(app)
   '''
   @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
@@ -196,30 +199,37 @@ def create_app(test_config=None):
     new_category = body.get('category', None)
     new_difficulty = body.get('difficulty', None)
   
-    if (new_question is None) or (new_answer is None):
-      abort(400, {'message': 'Question/ Answer can not be blank'})  
-      
-    try:
-        question = Question(question=new_question, answer=new_answer, category=new_category,
-                          difficulty=new_difficulty)
-        question.insert()
-
-        selection = Question.query.order_by(Question.id).all()
-        current_questions = paginate_questions(request, selection)
-
-
-        return jsonify({
-            'success': True,
-            'created': question.id,
-            'questions': current_questions,
-            'total_questions': len(selection)
-            
+    if not new_question:
+      abort(400)#, {'message': 'Question can not be blank'})  
+    elif not new_answer:
+      abort(400)#, {'message': 'Answer can not be blank'})
+    else:
+      try:
+          question = Question(question = new_question, 
+                              answer = new_answer, 
+                              category = new_category,
+                              difficulty = new_difficulty)
+          
+          question.insert()
+          session_commit()
+          flash('Question was successfully Added!')
+          
+          selection = Question.query.order_by(Question.id).all()
+          current_questions = paginate_questions(request, selection)
+          
+          return jsonify({
+              'success': True,
+              'created': question.id,
+              'questions': current_questions,
+              'total_questions': len(selection)
           })
-    except:
-      db.session.rollback()
-      abort(400)
-    finally:
-      db.session.close()
+          
+      except:
+        flash('An error occurred due to database insertion error. Question could not be listed.')
+        # session_rollback()
+        abort(400)
+      finally:
+        session_close()
 
   '''
   TEST: When you submit a question on the "Add" tab, 
@@ -316,46 +326,36 @@ def create_app(test_config=None):
   '''
   @app.route('/quizzes', methods=['POST'])
   def play_quiz():
-    
     body = request.get_json()
     
     if not body:
       abort(400, {'message': 'Please provide quiz data.'})
       
     previous_questions = body.get('previous_questions', None)
-    current_category = body.get('current_category', None)
+    current_category = body.get('quiz_category', None)
     
-    if not previous_questions:
-      if current_category:
-        # if no previous questions is given, but category given then get any question from this category.
-        questions = (Question.query
-                         .filter(Question.category == str(current_category['id']))
-                         .all())
-      else:
-        # if no previous questions is given and also no category , just get any random one.
-        questions = (Question.query.all())
+    if not previous_questions and current_category:
+          # if no previous questions given, but category given then get any question within this category.
+          current_questions = (Question.query.filter(Question.category == str(current_category['id'])).all())
     else:
       if current_category:
-          # if previous questions is given and also a category, query questions in same category list differ than given list in previous questions
-        questions = (Question.query
-                         .filter(Question.category == str(current_category['id']))
-                         .filter(Question.id.notin_(previous_questions))
-                         .all())
+        # if given previous questions and category, query for questions which are not contained in previous question and in given category
+        current_questions = (Question.query
+          .filter(Question.category == str(current_category['id'])).filter(Question.id.notin_(previous_questions)).all())
       else:
-        # if previous questions is given but no category, query questions which are not contained in previous list of questions.
-        questions = (Question.query
-                     .filter(Question.id.notin_(previous_questions))
-                         .all())
-
-    # Format questions and choose random one
-    questions_formatted = format_questions(questions)
-    # random.randint(low, high=None)
-    # Return random integers from low(inclusive) to high(exclusive).
-    random_question = questions_formatted[random.randint(0, len(questions_formatted))]
-
+        # if given previous questions and no category, query for questions which are not contained in previous question.
+        current_questions = (Question.query.filter(Question.id.notin_(previous_questions)).all())
+    
+    if len(current_questions) > 0:
+      random_question = random.choice(current_questions) 
+    else:
+      # if no previous questions given and no category, just query any question.
+        current_questions = (Question.query.all())
+        random_question = random.choice(current_questions)
+    
     return jsonify({
         'success': True,
-        'question': random_question
+        'question': random_question.format()
     })
   '''
   TEST: In the "Play" tab, after a user selects "All" or a category,
@@ -415,6 +415,7 @@ def create_app(test_config=None):
         "message": "internal server error"
     }), 500
 
+   
   return app
 
 

@@ -24,8 +24,8 @@ class FormView extends Component {
         return;
       },
       error: (error) => {
-        // alert('Unable to load categories. Please try your request again')
-        document.write(error)
+        alert('Unable to load categories. Please try your request again')
+        // document.write(error)
         return;
       }
     })
@@ -50,11 +50,12 @@ class FormView extends Component {
       },
       crossDomain: true,
       success: (result) => {
+        alert('Question successfully added')
         document.getElementById("add-question-form").reset();
         return;
       },
       error: (error) => {
-        alert('Unable to add question. Please try your request again')
+        alert('Unable to add question. Please try again')
         return;
       }
     })
