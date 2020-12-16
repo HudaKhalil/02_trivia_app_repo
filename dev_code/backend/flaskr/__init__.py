@@ -130,7 +130,7 @@ def create_app(test_config=None):
     
     categories = Category.query.order_by(Category.id).all()
       
-    if not selection == 0:
+    if not current_questions:
           abort(404)
 
     

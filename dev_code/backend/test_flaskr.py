@@ -63,7 +63,7 @@ class TriviaTestCase(unittest.TestCase):
 #----------------------------------------------------------------------------#
     def test_get_questions_per_page(self):
         # Response for specific route
-        res = self.client().get('/questions?page=2',json={'category:': 'art'})
+        res = self.client().get('/questions?page=1',json={'category:': 'art'})
         # Load the data
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
@@ -111,7 +111,7 @@ class TriviaTestCase(unittest.TestCase):
         
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'bad request')
+        self.assertEqual(data['message'], 'Question can not be blank')
 #----------------------------------------------------------------------------#
 # Test # 3 POST /questions/search
 #----------------------------------------------------------------------------#
