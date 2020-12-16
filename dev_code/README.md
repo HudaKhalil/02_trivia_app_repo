@@ -33,9 +33,9 @@ The `./frontend` directory contains a complete React frontend to consume the dat
 1) [Fork](https://help.github.com/en/articles/fork-a-repo) the [project repository]() and [Clone](https://help.github.com/en/articles/cloning-a-repository) your forked repository to your machine. Work on the project locally and make sure to push all your changes to the remote repository before submitting the link to your repository in the Classroom. 
 2) Configure local database and connect it to a web application (Provided by Udacity).
 3) Running the flask server
-4) Completing backend tasks (
+4) Completing backend tasks 
+	 - [`./backend/`](./backend/README.md)
 	 - [`./frontend/`](./frontend/README.md)
-	 - [`./backend/`](./backend/README.md))
 5) Creating unittest (test-driven-development (TDD) for automated testing of APIs 
 6) Use "curl" to get responses from API
 7) Implement errorhandler to create error messages for trivia API clients
