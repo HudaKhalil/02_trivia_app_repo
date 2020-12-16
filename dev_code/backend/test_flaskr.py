@@ -111,7 +111,7 @@ class TriviaTestCase(unittest.TestCase):
         
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'Question/ Answer can not be blank')
+        self.assertEqual(data['message'], 'bad request')
 #----------------------------------------------------------------------------#
 # Test # 3 POST /questions/search
 #----------------------------------------------------------------------------#

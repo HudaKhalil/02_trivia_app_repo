@@ -130,7 +130,7 @@ def create_app(test_config=None):
     
     categories = Category.query.order_by(Category.id).all()
       
-    if len(selection) == 0:
+    if not selection == 0:
           abort(404)
 
     
@@ -200,9 +200,9 @@ def create_app(test_config=None):
     new_difficulty = body.get('difficulty', None)
   
     if not new_question:
-      abort(400)#, {'message': 'Question can not be blank'})  
+      abort(400, {'message': 'Question can not be blank'})  
     elif not new_answer:
-      abort(400)#, {'message': 'Answer can not be blank'})
+      abort(400, {'message': 'Answer can not be blank'})
     else:
       try:
           question = Question(question = new_question, 
@@ -212,7 +212,7 @@ def create_app(test_config=None):
           
           question.insert()
           session_commit()
-          flash('Question was successfully Added!')
+          
           
           selection = Question.query.order_by(Question.id).all()
           current_questions = paginate_questions(request, selection)
