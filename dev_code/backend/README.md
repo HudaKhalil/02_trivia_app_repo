@@ -19,7 +19,7 @@ A virtual environment whenever using Python for projects, keeps dependencies for
 Initialize and activate a virtualenv:
 ```bash
   cd YOUR_PROJECT_DIRECTORY_PATH/
-  virtualenv
+  python -m virtualenv env
   source env/Scripts/activate
 ```
 
